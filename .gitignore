@@ -1,0 +1,49 @@
+# Visual Studio
+.vs/
+*.VC.db
+*.VC.VC.opendb
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build Folders
+Debug/
+Release/
+x64/Debug/
+x64/Release/
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.idb
+*.log
+
+# Visual Studio Code
+.vscode/
+
+# Windows Thumbnails and system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Backup files
+*.bak
+*.tmp
+*.~*
+
+# Other generated files
+ipch/
+*.iobj
+*.ipdb
+*.tlog/
+*.lastbuildstate
+*.ncb
+*.opensdf
+*.sdf
+*.cache
+*.sbr
+*.aps
+*.pch
+*.res
+*.ilk
