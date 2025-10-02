@@ -47,3 +47,5 @@ ipch/
 *.pch
 *.res
 *.ilk
+
+Report/

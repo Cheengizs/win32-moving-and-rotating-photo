@@ -31,6 +31,7 @@ Point basePoints[POINTSIZE] = {
 
 float angle = 0.0f;
 const float ROTATEANGLE = 5.0f;
+HCURSOR hCurs3; // cursor handle 
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -40,7 +41,7 @@ void UpdatePoints()
 
     // x_new = cx + (x' - cx) * cos(angleRad) - (y' - cy) * sin(angleRad)
     // y_new = cy + (x' - cx) * sin(angleRad) + (y' - cy) * cos(angleRad)
-    
+
     for (int i = 0; i < POINTSIZE; i++)
     {
         float dx = basePoints[i].X;
@@ -52,12 +53,103 @@ void UpdatePoints()
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
 {
+    HINSTANCE hinst = hInstance; // handle to current instance  
+    HCURSOR hCurs1, hCurs2; // cursor handles 
+
+
+    // Yin-shaped cursor AND mask (32x32x1bpp)
+    BYTE ANDmaskCursor[] =
+    {
+        0xFF, 0xFC, 0x3F, 0xFF, // ##############----##############
+        0xFF, 0xC0, 0x1F, 0xFF, // ##########---------#############
+        0xFF, 0x00, 0x3F, 0xFF, // ########----------##############
+        0xFE, 0x00, 0xFF, 0xFF, // #######---------################
+        0xF8, 0x01, 0xFF, 0xFF, // #####----------#################
+        0xF0, 0x03, 0xFF, 0xFF, // ####----------##################
+        0xF0, 0x03, 0xFF, 0xFF, // ####----------##################
+        0xE0, 0x07, 0xFF, 0xFF, // ###----------###################
+        0xC0, 0x07, 0xFF, 0xFF, // ##-----------###################
+        0xC0, 0x0F, 0xFF, 0xFF, // ##----------####################
+        0x80, 0x0F, 0xFF, 0xFF, // #-----------####################
+        0x80, 0x0F, 0xFF, 0xFF, // #-----------####################
+        0x80, 0x07, 0xFF, 0xFF, // #------------###################
+        0x00, 0x07, 0xFF, 0xFF, // -------------###################
+        0x00, 0x03, 0xFF, 0xFF, // --------------##################
+        0x00, 0x00, 0xFF, 0xFF, // ----------------################
+        0x00, 0x00, 0x7F, 0xFF, // -----------------###############
+        0x00, 0x00, 0x1F, 0xFF, // -------------------#############
+        0x00, 0x00, 0x0F, 0xFF, // --------------------############
+        0x80, 0x00, 0x0F, 0xFF, // #-------------------############
+        0x80, 0x00, 0x07, 0xFF, // #--------------------###########
+        0x80, 0x00, 0x07, 0xFF, // #--------------------###########
+        0xC0, 0x00, 0x07, 0xFF, // ##-------------------###########
+        0xC0, 0x00, 0x0F, 0xFF, // ##------------------############
+        0xE0, 0x00, 0x0F, 0xFF, // ###-----------------############
+        0xF0, 0x00, 0x1F, 0xFF, // ####---------------#############
+        0xF0, 0x00, 0x1F, 0xFF, // ####---------------#############
+        0xF8, 0x00, 0x3F, 0xFF, // #####-------------##############
+        0xFE, 0x00, 0x7F, 0xFF, // #######----------###############
+        0xFF, 0x00, 0xFF, 0xFF, // ########--------################
+        0xFF, 0xC3, 0xFF, 0xFF, // ##########----##################
+        0xFF, 0xFF, 0xFF, 0xFF // ################################
+    };
+
+    // Yin-shaped cursor XOR mask (32x32x1bpp)
+    BYTE XORmaskCursor[] =
+    {
+        0x00, 0x00, 0x00, 0x00, // --------------------------------
+        0x00, 0x03, 0xC0, 0x00, // --------------####--------------
+        0x00, 0x3F, 0x00, 0x00, // ----------######----------------
+        0x00, 0xFE, 0x00, 0x00, // --------#######-----------------
+        0x03, 0xFC, 0x00, 0x00, // ------########------------------
+        0x07, 0xF8, 0x00, 0x00, // -----########-------------------
+        0x07, 0xF8, 0x00, 0x00, // -----########-------------------
+        0x0F, 0xF0, 0x00, 0x00, // ----########--------------------
+        0x1F, 0xF0, 0x00, 0x00, // ---#########--------------------
+        0x1F, 0xE0, 0x00, 0x00, // ---########---------------------
+        0x3F, 0xE0, 0x00, 0x00, // --#########---------------------
+        0x3F, 0xE0, 0x11, 0x00, // --#########---------------------
+        0x3F, 0xF0, 0x11, 0x00, // --##########--------------------
+        0x7F, 0xF0, 0x22, 0x00, // -###########--------------------
+        0x7F, 0xF8, 0x22, 0x00, // -############-------------------
+        0x7F, 0xFC, 0x22, 0x00, // -#############------------------
+        0x7F, 0xFF, 0x22, 0x00, // -###############----------------
+        0x7F, 0xFF, 0x80, 0x00, // -################---------------
+        0x7F, 0xFF, 0xE0, 0x00, // -##################-------------
+        0x3F, 0xFF, 0xE0, 0x00, // --#################-------------
+        0x3F, 0xC7, 0xF0, 0x00, // --########----######------------
+        0x3F, 0x83, 0xF0, 0x00, // --#######------#####------------
+        0x1F, 0x83, 0xF0, 0x00, // ---######------#####------------
+        0x1F, 0x83, 0xE0, 0x00, // ---######------####-------------
+        0x0F, 0xC7, 0xE0, 0x00, // ----######----#####-------------
+        0x07, 0xFF, 0xC0, 0x00, // -----#############--------------
+        0x07, 0xFF, 0xC0, 0x00, // -----#############--------------
+        0x01, 0xFF, 0x80, 0x00, // -------##########---------------
+        0x00, 0xFF, 0x00, 0x00, // --------########----------------
+        0x00, 0x3C, 0x00, 0x00, // ----------####------------------
+        0x00, 0x00, 0x00, 0x00, // --------------------------------
+        0x00, 0x00, 0x00, 0x00 // --------------------------------
+    };
+
+    // Create a custom cursor at run time. 
+
+    hCurs3 = CreateCursor(hinst, // app. instance 
+                          19, // horizontal position of hot spot 
+                          2, // vertical position of hot spot 
+                          32, // cursor width 
+                          32, // cursor height 
+                          ANDmaskCursor, // AND mask 
+                          XORmaskCursor); // XOR mask 
+
     hInstanceGlobal = hInstance;
 
     WNDCLASS wc = {};
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = hInstance;
     wc.lpszClassName = L"Sample Window Class";
+
+    // wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hCursor = hCurs3;    
 
     RegisterClass(&wc);
 
@@ -69,6 +161,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
         CW_USEDEFAULT, CW_USEDEFAULT, 800, 600,
         NULL, NULL, hInstance, NULL
     );
+
 
     if (!hwnd) return 0;
 
@@ -95,9 +188,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch (uMsg)
     {
     case WM_DESTROY:
-        PostQuitMessage(0);
-        return 0;
-
+        {
+            PostQuitMessage(0);
+            return 0;
+        }
     case WM_PAINT:
         {
             PAINTSTRUCT ps;
@@ -133,13 +227,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     case WM_KEYDOWN:
         {
-
             if ((GetKeyState(VK_CONTROL) & 0x8000) && wParam == 'Z') // Ctrl + Z
             {
                 PostQuitMessage(0); // закрытие приложения
                 return 0;
             }
-            
+
             if (wParam == 'C') // Создание картинки
             {
                 if (!isCreated)
@@ -192,6 +285,5 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             return 0;
         }
     }
-
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
